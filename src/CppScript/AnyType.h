@@ -18,9 +18,9 @@ enum class AnyPtr : uint8_t {
 /// value type capturing type information
 struct AnyType {
     const std::type_info* type_info;
+    AnyPtr ptr_type : 6;
     bool is_void : 1;
     bool is_const : 1;
-    AnyPtr ptr_type : 8;
 
     AnyType()
         : type_info(&typeid(void))
@@ -37,7 +37,7 @@ struct AnyType {
         , ptr_type(ptr_type)
     {}
 
-    operator==(const AnyType& o) const {
+    bool operator==(const AnyType& o) const {
         return *this->type_info == *o.type_info &&
                 this->is_void == o.is_void &&
                 this->is_const == o.is_const &&

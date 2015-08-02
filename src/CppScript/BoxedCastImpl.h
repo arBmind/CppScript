@@ -5,8 +5,15 @@
 // impl
 namespace CppScript {
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
+#ifdef __GCC
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wreturn-type"
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(push)
+#pragma warning(disable : 4715)
+#endif
 
 template< typename ToType >
 bool
@@ -28,7 +35,7 @@ BoxedCast< ToType >::cast(const Boxed &value) {
 template< typename ToType >
 bool
 BoxedCast<ToType &>::allowed(const Boxed &value) {
-    return not value.type().is_const && *value.type().type_info == typeid(ToType);
+    return ! value.type().is_const && *value.type().type_info == typeid(ToType);
 }
 
 template< typename ToType >
@@ -62,7 +69,7 @@ CppScript::BoxedCast<const ToType *>::cast(const Boxed &value) {
 template< typename ToType >
 bool
 BoxedCast<ToType *>::allowed(const Boxed &value) {
-    return not value.type().is_const && *value.type().type_info == typeid(ToType);
+    return ! value.type().is_const && *value.type().type_info == typeid(ToType);
 }
 
 template< typename ToType >
@@ -75,6 +82,14 @@ BoxedCast<ToType *>::cast(const Boxed &value) {
     case AnyPtr::shared: return static_cast< std::shared_ptr<ToType>* >(value.data())->get();
     }
 }
+
+#ifdef __GCC
+#  pragma GCC diagnostic pop
+#endif
+
+#ifdef _MSC_VER
+#pragma warning(pop)
+#endif
 
 template< typename ToType >
 bool
@@ -91,14 +106,12 @@ CppScript::BoxedCast<std::shared_ptr<const ToType> >::cast(const Boxed &value) {
 template< typename ToType >
 bool
 BoxedCast<std::shared_ptr<ToType> >::allowed(const Boxed &value) {
-    return not value.type().is_const && value.type().ptr_type == AnyPtr::shared && *value.type().type_info == typeid(ToType);
+    return ! value.type().is_const && value.type().ptr_type == AnyPtr::shared && *value.type().type_info == typeid(ToType);
 }
 
 template< typename ToType >
 typename BoxedCast<std::shared_ptr<ToType> >::Result CppScript::BoxedCast<std::shared_ptr<ToType> >::cast(const Boxed &value) {
     return *static_cast< std::shared_ptr<ToType>* >(value.data());
 }
-
-#pragma GCC diagnostic pop
 
 } // namespace CppScript

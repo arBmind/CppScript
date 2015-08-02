@@ -156,7 +156,7 @@ void testBoxedConversion(const Boxed &value, bool expectSuccess)
         }
     }
     else {
-        QVERIFY2(not value.is<To>(), typeid(To).name());
+        QVERIFY2(! value.is<To>(), typeid(To).name());
     }
 }
 
